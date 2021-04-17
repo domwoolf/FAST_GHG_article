@@ -1,0 +1,10 @@
+Tillage,Crop,Moisture,F_Y_T,se_F_Y_T ,d_F_Y_T
+No-till,Maize,All,-3.750,5.250,normal
+No-till,Soybean,All,2.800,5.389,normal
+No-till,Wheat,Moist,-3.400,1.148,normal
+No-till,Wheat,Dry,4.000,1.837,normal
+Reduced-till,Maize,All,-3.750,5.250,normal
+Reduced-till,Soybean,All,2.800,5.389,normal
+Reduced-till,Wheat,Moist,-3.400,1.148,normal
+Reduced-till,Wheat,Dry,4.000,1.837,normal
+Conventional,All,All,0.000,0.000,normal

@@ -1,0 +1,10 @@
+Tillage,Crop,Moisture,F_Y_T
+No-till,Maize,All,0
+No-till,Soybean,All,0
+No-till,Wheat,Moist,-4
+No-till,Wheat,Dry,4.3
+Reduced-till,Maize,All,0
+Reduced-till,Soybean,All,0
+Reduced-till,Wheat,Moist,-2
+Reduced-till,Wheat,Dry,2.2
+Conventional,All,All,0

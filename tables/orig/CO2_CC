@@ -1,0 +1,11 @@
+Cover.crop,Tillage,Delta.CO2_I_CC,Delta.CO2_F_CC
+None,All,0,0
+Non-legume,Conventional,-0.037,-0.04
+Non-legume,Reduced-till,-0.059,-0.029
+Non-legume,No-till,-0.059,-0.029
+Legume,Conventional,-0.017,-0.04
+Legume,Reduced-till,-0.039,-0.029
+Legume,No-till,-0.039,-0.029
+Mixed,Conventional,-0.027,-0.04
+Mixed,Reduced-till,-0.049,-0.029
+Mixed,No-till,-0.049,-0.029

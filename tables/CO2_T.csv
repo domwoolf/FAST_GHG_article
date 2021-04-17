@@ -1,0 +1,8 @@
+Tillage,Crop,Delta.CO2_I_T,sd_Delta.CO2_I_T,d_Delta.CO2_I_T,Delta.CO2_F_T,sd_Delta.CO2_F_T,d_Delta.CO2_F_T
+Reduced-till,Maize,-0.005,0.001,normal,0.08,0.0004,normal
+Reduced-till,Wheat,-0.01,0.001,normal,0.08,0.0004,normal
+Reduced-till,Soybean,-0.005,0.001,normal,0.08,0.0004,normal
+No-till,Maize,-0.01,0.001,normal,0.1,0.0004,normal
+No-till,Wheat,-0.02,0.001,normal,0.1,0.0004,normal
+No-till,Soybean,-0.01,0.001,normal,0.1,0.0004,normal
+Conventional,All,0,0,normal,0,0,normal

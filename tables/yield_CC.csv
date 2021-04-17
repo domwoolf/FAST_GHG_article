@@ -1,0 +1,7 @@
+Crop,Cover.crop,F_Y_CC,se_F_Y_CC,d_F_Y_CC
+Maize,Non-legume,3,2.6,normal
+Wheat,Non-legume,-3,1.7,normal
+Soybean,Non-legume,-3,1.7,normal
+Maize,Legume,0.3,2.6,normal
+Wheat,Legume,0.3,1.7,normal
+Soybean,Legume,0.3,1.7,normal

@@ -1,0 +1,7 @@
+Crop,Moisture,f_Nv,sdlog_f_Nv,Distribution,f_Nl,sdlog_f_Nl,Distribution
+Maize,Moist,0.00242,0.58,lognormal,0.00415,0.58,lognormal
+Maize,Dry,0.00086,0.8,lognormal,0,,lognormal
+Wheat,Moist,0.00242,0.58,lognormal,0.00415,0.58,lognormal
+Wheat,Dry,0.00086,0.8,lognormal,0,,lognormal
+Soybean,Moist,0.00242,0.58,lognormal,0.00415,0.58,lognormal
+Soybean,Dry,0.00086,0.8,lognormal,0,,lognormal
