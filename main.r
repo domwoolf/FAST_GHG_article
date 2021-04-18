@@ -11,7 +11,6 @@ source('FAST-GHG_complete_grid_vectorised.R')
 source('merge_spatial.r')
 source('draw_maps.r')
 
-
 # Monte carlo results
 if(!file.exists('merged_tables_monte.csv')) source('merge_tables_monte.r')
 source('FAST-GHG_monte.R')

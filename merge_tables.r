@@ -22,7 +22,6 @@ read.tab = function(fname, path = tables.path) {
 tab.names = list.files(tables.path, '.csv')
 tabs = lapply(tab.names, read.tab)
 names(tabs) = sub('.csv$', '', tab.names)
-# tabs$state[, c('Temperature', 'Moisture') := transpose(strsplit(climate, ' '))]
 tabs$county[, c('Temperature', 'Moisture') := transpose(strsplit(climate, ' '))]
 
 # Add keys to all tables
@@ -38,7 +37,6 @@ lapply(alltabs, function (tab) {
   tab[, (keys) := replace(.SD, .SD == "Soy", "Soybean"), .SDcols = keys]
   setkeyv(tab, keys)
 })
-
 
 # Merge all parameter tables
 key_vals = rbindlist(alltabs, fill = TRUE)[, list((sapply(.SD, unique))), .SDcols = keys]
@@ -65,7 +63,6 @@ fill_match = function(x, y, keys) {
 
 mergedtabs = lapply(alltabs, fill_match, all_keys, keys)
 mymerge = function(x,y) merge.data.table(x, y, all=TRUE) 
-# mymerge = function(x,y) merge.data.table(x, y) 
 mergedtabs = Reduce(mymerge, mergedtabs)
 mergedtabs[, (grep("^d_|^se_|^sd_|^logsd_|^sdlog_|Distribution", names(mergedtabs))) := NULL]
 
