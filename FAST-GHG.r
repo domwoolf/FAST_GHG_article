@@ -1,6 +1,11 @@
-FAST_GHG = function (results) {
+FAST_GHG = function (results, filter_dry.cc = FALSE) {
   # exclude results for cover crops in dry climate
-  results = results[Cover.crop == 'None' | Moisture == 'Moist'] 
+ if (filter_dry.cc) {
+   results = results[Cover.crop == 'None' | Moisture == 'Moist']
+   warning('results are not updated by reference')
+ } else {
+   warning('results are updated by reference')
+ }
   
   # Initialise columns to correct units and factors
   results[Cover.crop == 'None', F_Y_CC := 0.0]
@@ -11,6 +16,8 @@ FAST_GHG = function (results) {
   results[, F_Y_T := F_Y_T/100]   # convert from percent to fraction
   results[, F_i := F_i/1000]      # convert units to Mg Co2e / kg grain
   results[, F_p := F_p/1000]      # convert units to Mg Co2e / kg grain
+  results[is.na(Delta.ON), Delta.ON := 0]
+  results[is.na(f_Nl), f_Nl := 0]
   
   # Table 11: Direct N2O emission factor for mineral fertilizer
   results[,                                      f_Nd := 0.0079] # kg N2O/ kg N
@@ -62,12 +69,12 @@ FAST_GHG = function (results) {
                Delta.CO2_N    = 'N fertilizer production', 
                Delta.CO2e_N2O = 'N2O emissions', 
                Delta.GHG      = 'Total')
-  
-  all_fast = melt.data.table(results, measure.vars = names(GHG.labs), 
-                             id.vars = c("STATEFP", "STATE", "COUNTYFP", "NAME", "ALAND", "AWATER", 
-                                         "Temperature", "Moisture", "Soil", "clay", 
-                                         "Crop", "Cover.crop", "Tillage"))
+  id.vars = c("STATEFP", "STATE", "COUNTYFP", "NAME", "ALAND", "AWATER", 
+              "Temperature", "Moisture", "Soil", "clay", 
+              "Crop", "Cover.crop", "Tillage")
+  id.vars = intersect(id.vars, names(results))
+  all_fast = melt.data.table(results, measure.vars = names(GHG.labs), id.vars = id.vars)
   all_fast[, label := GHG.labs[variable]]
-  setkey(all_fast, STATEFP, COUNTYFP, Crop, Cover.crop, Tillage, variable)
+  setkeyv(all_fast, c(intersect(c('STATEFP', 'COUNTYFP', 'Crop', 'Cover.crop', 'Tillage'), names(all_fast)), 'variable'))
   return(all_fast)
 }

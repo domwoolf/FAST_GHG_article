@@ -21,6 +21,12 @@ county[, variable := sub("Maize|Soybean|Wheat", "", variable)]
 county = dcast(county, STATEFP + STATE + COUNTYFP + NAME + ALAND + AWATER + clay + Soil + Temperature + Moisture + Crop ~ variable , value.var = "value")
 setkey(county, STATEFP, COUNTYFP, Temperature, Moisture, Soil, Crop)
 
+# average county values, per climate zone
+Mode = function(x) names(sort(table(x), decreasing = TRUE)[1])
+zones = county[, .(clay=mean(clay), Soil=Mode(Soil), Nrate=mean(Nrate, na.rm = TRUE), Yield=mean(Yield, na.rm = TRUE)), by = .(Temperature, Moisture, Crop)]
+zones = zones[complete.cases(zones)]
+setkey(zones,Temperature,Moisture,Soil,Crop)
+
 # add cover,crop and tillage columns to county, and merge in their respective bmp values per crop
 bmp = fread('bmp.csv', select = c("COUNTYFP", "STATEFP",
                                   "Maize_BMP", "Wheat_BMP", "Soybean_BMP", 
@@ -36,15 +42,11 @@ setkey(bmp.long, STATEFP, COUNTYFP, Crop, Cover.crop, Tillage)
 county[bmp.long, c("Cover.crop","Tillage") := .(i.Cover.crop, i.Tillage), on = c("STATEFP","COUNTYFP","Crop")]
 
 # Read parameter values for all combinations of crop, cover-crop, tillage, soil, and climate
-params = fread("merged_tables_monte.csv")
+params = fread("merged_tables_sensitivity.csv")
 params[is.na(F_Y_CC), F_Y_CC := 0]
 params[is.na(F_Y_T),  F_Y_T  := 0]
 params[is.na(f_Nl),   f_Nl   := 0]
 keys = c("Cover.crop", "Tillage", "Crop", "Temperature", "Moisture", "Soil")
-
-# add randomised columns for reversal risk and intensification fraction
-params[, R   := runif(.N, 0.2, 0.8)]
-params[, f_i := runif(.N, 0.2, 0.8)]
 
 #  convert key columns to factor to save memory allocation in large table
 params[, (keys)      := lapply(.SD, as.factor), .SDcols=keys]
@@ -56,22 +58,45 @@ setkeyv(params, keys)
 setkeyv(county, keys)
 
 # Merge county and parameter tables to create large database of randomised bmp parameter values for every county
-results = merge.data.table(county, params, allow.cartesian=TRUE)
+results = merge.data.table(zones, params, allow.cartesian=TRUE)
 
 # Run model (note that results data.table is also updated by reference)
+results = results[Cover.crop == 'None' | Moisture == 'Moist']
 all_fast = FAST_GHG(results)
 gc()
 
-# summarise GHG source values
-all_fast[, .(mean = mean(value), sd = sd(value)), by=label]
 
-# extract only total GHGs for each practice/location
-totals = all_fast[label == 'Total'][, c('variable', 'label') := NULL]
-setnames(totals, c('Cover.crop'), c('CC'))
 
-# remove cartesian grid of results to save memory - we just use the totals going forwards
-rm(all_fast)
-gc()
+# plot results
+# with climate...
+results.summary = results[, .(Delta.GHG = mean(Delta.GHG)), by = .(Cover.crop,Tillage,Crop,Temperature,Moisture,sensitivity, sens_level)]
+results.summary = dcast(results.summary, Cover.crop+Tillage+Crop +Temperature +Moisture+sensitivity~sens_level, value.var = 'Delta.GHG')
+
+# without climate...
+results.summary = results[, .(Delta.GHG = mean(Delta.GHG)), by = .(Cover.crop,Tillage,Crop,sensitivity, sens_level)]
+results.summary = dcast(results.summary, Cover.crop+Tillage+Crop+sensitivity~sens_level, value.var = 'Delta.GHG')
+
+ggplot(results.summary, aes(sensitivity, color=Crop)) +
+  geom_errorbar(aes(ymax=high,ymin=low)) +
+  coord_flip() +
+  facet_grid(Cover.crop~Tillage)
+
+# without climate or crop...
+results.summary = copy(results)
+results.summary = results[, .(Delta.GHG = scale(Delta.GHG)[,1], sensitivity, sens_level), by = .(Cover.crop,Tillage,Crop)]
+results.summary[is.na(Delta.GHG), Delta.GHG := 0]
+results.summary = results.summary[, .(Delta.GHG = mean(Delta.GHG)), by = .(sensitivity, sens_level)]
+results.summary = dcast(results.summary, sensitivity~sens_level, value.var = 'Delta.GHG')
+results.summary[, rng := abs(high-low)]
+setorder(results.summary, rng)
+results.summary[, sensitivity := factor(sensitivity, levels = sensitivity)]
+ggplot(results.summary, aes(sensitivity)) +
+  geom_errorbar(aes(ymax=high,ymin=low)) +
+  coord_flip() 
+
+
+
+
 
 # merge harvested area
 ha = melt(bmp, c('COUNTYFP', 'STATEFP'), patterns("ha$"), variable.name = "Crop", value.name = "ha")

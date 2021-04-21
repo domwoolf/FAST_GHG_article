@@ -1,8 +1,6 @@
 library(data.table)
 tables.path = 'tables/'
-states = fread(paste0(tables.path, 'state.csv'))[, .(state = NAME)]
 counties = fread(paste0(tables.path, 'county.csv'))[, .(state = STATE, county = NAME)]
-setkey(states, state)
 setkey(counties, state, county)
 
 # ---------------------------------------------------------------------------------------------
@@ -47,7 +45,6 @@ setDT(all_keys)
 setkeyv(all_keys,keys)
 
 fill_match = function(x, y, keys) {
-  # browser()
   m = lapply(seq_len(nrow(x)), function(i) {
     keycols = x[i, ..keys]
     valcols = x[i, .SD, .SDcols = setdiff(names(x), keys)]
@@ -64,7 +61,7 @@ fill_match = function(x, y, keys) {
 mergedtabs = lapply(alltabs, fill_match, all_keys, keys)
 mymerge = function(x,y) merge.data.table(x, y, all=TRUE) 
 mergedtabs = Reduce(mymerge, mergedtabs)
+fwrite(mergedtabs, "merged_tables_dist.csv")
 mergedtabs[, (grep("^d_|^se_|^sd_|^logsd_|^sdlog_|Distribution", names(mergedtabs))) := NULL]
-
 fwrite(mergedtabs, "merged_tables.csv")
 
